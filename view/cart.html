@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title></title>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/cart.css"/>
+</head>
+<body>
+    <%- include("./header.html")%>
+    <div id="content">
+        <div id="contentTop">
+            <div id="wenzi1">
+                LITTLE BAG
+            </div>
+            <div id="wenzi2">
+                购物车
+            </div>
+        </div>
+        <div id="contentTopOne">
+            <div id="contentTopWen">
+                <span><input type="checkbox" id="checkAll"></span>
+                <span>商品名称</span>
+                <span id="span1">单价</span>
+                <span class="span2">数量</span>
+                <span class="span2">小计</span>
+                <span class="span2">操作</span>
+            </div>
+        </div>
+    </div>
+    <div id="contentMiddom">
+            <% for(var i=0;i<productList.length;i++){%>
+            <div class="contentMiddomOne">
+                <div>
+                    <input type="checkbox" data-sid="<%=productList[i].sid%>"/>
+                </div>
+                <div class="middonOne">
+                    <img src="<%=productList[i].feng%>" alt=""/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%=productList[i].title%>
+                </div>
+                <div class="middomTwo">
+                    ￥<%=productList[i].price%>
+                </div>
+                <div class="middomThree">
+                    <%=productList[i].num%>
+                </div>
+                <div class="middomFour"><%=productList[i].price*productList[i].num%></div>
+                <div class="middomFive">
+                    <a href="javascript" id="btndel">删除</a>
+                </div>
+            </div>
+               <%}%>
+          
+            <div id="contentMiddomTwo">
+                <div id="middonOne1">
+                    <div class="middonOne1">
+                        赠送
+                    </div>
+                    <div class="middonOne2">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;轻松理赔（运费险）
+                    </div>
+                </div>
+                <div id="middomTwo1">
+                    赠送
+                </div>
+                <div id="middomThree1">
+                    1
+                </div>
+                <div id="middomFour1">
+                    0
+                </div>
+                <div id="middomFive1">
+                    <a href="">删除</a>
+                </div>
+            </div>
+            <hr/>
+            <div id="contentBottom">
+                <div id="contentBottomOne">
+                    总计 ￥<span id="spantotal">0</span>
+                </div>
+                <div id="contentBottomTwo">
+                    现在结算
+                </div>
+            </div>
+        </div>
+</div>
+<%- include("./footer.html")%>
+<script src="js/jquery.3.4.0.js"></script>
+<script src="layui/layui.all.js"></script>
+<script type="text/javascript" src="js/javascript.js"></script>
+<script type="text/javascript">
+    var layer = layui.layer
+    $("#contentMiddom").on("click","input[type='checkbox']",function(){
+        var check=$(this).prop("checked");
+        var total=Number($("#spantotal").text());
+        var sub=Number($(this).parent().parent().find(".middomFour").html());
+        console.log(sub,total)
+        if(check){
+            total += sub;
+        }else{
+            total -= sub;
+        }
+        $("#spantotal").html(total);
+        var checkArr=$("#contentMiddom input[type='checkbox']");
+        var all=true;
+        for(var i=0;i<checkArr.length;i++){
+            if(!$(checkArr[i]).prop('checked')){
+                all=false;
+                break;
+            }
+        }
+        $("#checkAll").prop("checked",all);
+    })
+    $("#checkAll").click(function(){
+        var checked=$(this).prop("checked");
+        var checkArr=$("#contentMiddom input[type='checkbox']");
+        for(var i=0;i<checkArr.length;i++){
+            var nowCheck=$(checkArr[i]).prop('checked');
+            if(nowCheck!=checked){
+                $(checkArr[i]).prop('checked',checked);
+                $(checkArr[i]).change();
+            }
+        }
+    })
+    $("#contentBottomTwo").click(function(){
+        var checkAll=$("#contentMiddom input[type='checkbox']:checked");
+        var sid=[];
+        for(var i=0;i<checkAll.length;i++){
+            sid.push($(checkAll[i]).attr("data-sid"));
+        }
+        var sidstr=sid.join(",");
+        $.ajax({
+            type:"post",
+            url:"/order.do",
+            data:"sidstr="+sidstr+"&total="+$("#spantotal").html(),
+            success:function(data){
+                if(data.code==202){
+                    location.href="index.html";
+                }else{
+                    layer.msg(data.message); 
+                }
+            }
+        })
+    })
+</script>
+</body>
+</html>

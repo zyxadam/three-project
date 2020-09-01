@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<%-include ('./header.html')%>
+<h2>首页</h2>
+<% for(var i=0;i<userList.length;i++){%>
+   <p><%=userList[i].userName %></p>  //使用某个变量,这里的名称，是render里传递过去的键值
+<%} %>
+<%-include ('./footer.html')%>
+</body>
+</html>
